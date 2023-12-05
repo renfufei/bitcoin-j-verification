@@ -76,6 +76,10 @@ cd /usr/local/source_code/bitcoin-j-verification
 
 docker run --name bitcoin-j-verification -it bitcoin-j-verification
 
+
+# 或者:后台模式运行
+docker run -d --name bitcoin-j-verification bitcoin-j-verification
+
 ```
 
 
