@@ -61,7 +61,20 @@ git clone https://github.com/renfufei/bitcoin-j-verification.git
 6. 构建Docker镜像
 
 ```shell
+
+cd /usr/local/source_code/bitcoin-j-verification
+
 ./build-docker.sh
+
+
+```
+
+
+7. 启动 Docker
+
+```shell
+
+docker run --name bitcoin-j-verification -it bitcoin-j-verification
 
 ```
 
