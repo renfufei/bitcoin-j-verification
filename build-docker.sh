@@ -1,1 +1,1 @@
-docker build .
+docker build -t bitcoin-j-verification  .
