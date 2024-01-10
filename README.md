@@ -64,6 +64,10 @@ git clone https://github.com/renfufei/bitcoin-j-verification.git
 
 cd /usr/local/source_code/bitcoin-j-verification
 
+# 更新源码
+git pull
+
+
 ./build-docker.sh
 
 
