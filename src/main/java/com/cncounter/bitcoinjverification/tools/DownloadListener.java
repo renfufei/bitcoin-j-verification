@@ -25,7 +25,12 @@ public class DownloadListener extends DownloadProgressTracker {
         List<Transaction> transactions = block.getTransactions();
         int transactionsSize = transactions.size();
         //
-        log.info("有区块下载完成: peer={}; blockHash={}; transactionsSize={};  blocksLeft={};  ", peerHostAddress, blockHash, transactionsSize, blocksLeft);
+        log.info("[下载监听]有区块下载完成: peer={}; blockHash={}; transactionsSize={};  blocksLeft={};  ", peerHostAddress, blockHash, transactionsSize, blocksLeft);
         super.onBlocksDownloaded(peer, block, filteredBlock, blocksLeft);
+    }
+
+    @Override
+    public void doneDownload() {
+        log.info("[下载监听]blockchain downloaded");
     }
 }
