@@ -30,11 +30,23 @@ public class BitCoinJ {
     @PostConstruct
     public void init() {
         log.info("[系统启动]BitCoinJ: 开始初始化");
-        try {
-            startMainNet();
-        } catch (Exception e) {
-            log.warn("[系统启动]启动主网失败! error:{}", e.getMessage(), e);
-        }
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startMainNet();
+                } catch (Exception e) {
+                    log.warn("[系统启动]启动主网失败! error:{}", e.getMessage(), e);
+                }
+            }
+        });
+        thread.setDaemon(true);
+        thread.setName("" + this.getClass().getSimpleName() + "-startMain");
+        thread.start();
+        log.info("[系统启动]BitCoinJ: 异步初始化: 使用线程: " + thread.getName());
+    }
+
+    public void asyncInit() {
     }
 
     // 启动主网
@@ -49,6 +61,7 @@ public class BitCoinJ {
 
         File chainFile = new File(filePrefix + ".spvchain");
         if (chainFile.exists()) {
+            log.info("chainFile exists: {}; delete it;", chainFile.getName());
             chainFile.delete();
         }
 
