@@ -147,22 +147,9 @@ public class BinanceTickerMonitor {
         //
         String dateStrKey = curDateStrKey();
         {
-            // 1.1 顺便先清理过期的数据: 不是当日的都删除;
-            Set<String> keySet = lowerPriceNoticeMap.keySet();
-            for (String outerKey : keySet) {
-                if (!dateStrKey.equals(outerKey)) {
-                    lowerPriceNoticeMap.remove(outerKey);
-                }
-            }
-        }
-        {
-            // 1.2 获取当日的数据
-            Map<String, BigDecimal> curDateMap = lowerPriceNoticeMap.get(dateStrKey);
-            if (Objects.isNull(curDateMap)) {
-                curDateMap = new HashMap<>();
-                lowerPriceNoticeMap.put(dateStrKey, curDateMap);
-            }
             // 1.3 获取当前交易对的已通知价格;
+            Map<String, BigDecimal> curDateMap = lowPriceMap(dateStrKey, symbol);
+            // 2.3 获取当前交易对的已通知价格;
             BigDecimal hasNoticePrice = curDateMap.get(symbol);
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
@@ -174,26 +161,12 @@ public class BinanceTickerMonitor {
             // 设置 低价阈值 到Map
             curDateMap.put(symbol, price);
             // 执行通知; 不管成功失败
-            noticeDingDing(symbol, price, price);
+            noticeDingDing(symbol, price);
         }
 
         {
-            // 2.1 顺便先清理过期的数据: 不是当日的都删除;
-            Set<String> keySet = higherPriceNoticeMap.keySet();
-            for (String outerKey : keySet) {
-                if (!dateStrKey.equals(outerKey)) {
-                    higherPriceNoticeMap.remove(outerKey);
-                }
-            }
-        }
-        {
-            // 2.2 获取当日的数据
-            Map<String, BigDecimal> curDateMap = higherPriceNoticeMap.get(dateStrKey);
-            if (Objects.isNull(curDateMap)) {
-                curDateMap = new HashMap<>();
-                higherPriceNoticeMap.put(dateStrKey, curDateMap);
-            }
             // 2.3 获取当前交易对的已通知价格;
+            Map<String, BigDecimal> curDateMap = highPriceMap(dateStrKey, symbol);
             BigDecimal hasNoticePrice = curDateMap.get(symbol);
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
@@ -205,51 +178,76 @@ public class BinanceTickerMonitor {
             // 设置 低价阈值 到Map
             curDateMap.put(symbol, price);
             // 执行通知; 不管成功失败
-            noticeDingDing(symbol, price, price);
+            noticeDingDing(symbol, price);
         }
     }
 
-    private static void noticeLowPriceOncePerDay(BinanceTickerPrice tickerPrice, BigDecimal lowPrice) {
-        String symbol = tickerPrice.getSymbol();
-        BigDecimal price = tickerPrice.getPrice();
-        //
-        String dateStrKey = curDateStrKey();
-        // 顺便先清理过期的数据: 不是当日的都删除;
-        Set<String> keySet = lowPriceNoticeMap.keySet();
+
+    private static String highPrice(String dateStrKey, String symbol) {
+        Map<String, BigDecimal> curDateMap = highPriceMap(dateStrKey, symbol);
+        // 2.3 获取当前交易对的已通知价格;
+        BigDecimal hasNoticePrice = curDateMap.get(symbol);
+        if (Objects.isNull(hasNoticePrice)) {
+            return "-";
+        }
+        return hasNoticePrice.toPlainString();
+    }
+
+    private static Map<String, BigDecimal> highPriceMap(String dateStrKey, String symbol) {
+        // 2.1 顺便先清理过期的数据: 不是当日的都删除;
+        Set<String> keySet = higherPriceNoticeMap.keySet();
         for (String outerKey : keySet) {
             if (!dateStrKey.equals(outerKey)) {
-                lowPriceNoticeMap.remove(outerKey);
+                higherPriceNoticeMap.remove(outerKey);
             }
         }
-        boolean needNotice = true;
-        // 获取当日的数据
-        Map<String, BigDecimal> curDateMap = lowPriceNoticeMap.get(dateStrKey);
+        // 2.2 获取当日的数据
+        Map<String, BigDecimal> curDateMap = higherPriceNoticeMap.get(dateStrKey);
         if (Objects.isNull(curDateMap)) {
             curDateMap = new HashMap<>();
-            lowPriceNoticeMap.put(dateStrKey, curDateMap);
+            higherPriceNoticeMap.put(dateStrKey, curDateMap);
         }
-        // 获取当前交易对的已通知价格;
-        BigDecimal hasNoticePrice = curDateMap.get(symbol);
-        if (Objects.nonNull(hasNoticePrice)) {
-            // 已有价格 <= 低价阈值
-            if (hasNoticePrice.compareTo(lowPrice) <= 0) {
-                // log -
-                return; // 不再通知
-            }
-        }
-        // 设置 低价阈值 到Map
-        curDateMap.put(symbol, lowPrice);
-        // 执行通知; 不管成功失败
-        noticeDingDing(symbol, price, lowPrice);
+        return curDateMap;
     }
 
-    private static void noticeDingDing(String symbol, BigDecimal price, BigDecimal lowPrice) {
+    private static String lowPrice(String dateStrKey, String symbol) {
+
+        Map<String, BigDecimal> curDateMap = lowPriceMap(dateStrKey, symbol);
+        // 2.3 获取当前交易对的已通知价格;
+        BigDecimal hasNoticePrice = curDateMap.get(symbol);
+        if (Objects.isNull(hasNoticePrice)) {
+            return "-";
+        }
+        return hasNoticePrice.toPlainString();
+    }
+
+    private static Map<String, BigDecimal> lowPriceMap(String dateStrKey, String symbol) {
+        // 1.1 顺便先清理过期的数据: 不是当日的都删除;
+        Set<String> keySet = lowerPriceNoticeMap.keySet();
+        for (String outerKey : keySet) {
+            if (!dateStrKey.equals(outerKey)) {
+                lowerPriceNoticeMap.remove(outerKey);
+            }
+        }
+        // 1.2 获取当日的数据
+        Map<String, BigDecimal> curDateMap = lowerPriceNoticeMap.get(dateStrKey);
+        if (Objects.isNull(curDateMap)) {
+            curDateMap = new HashMap<>();
+            lowerPriceNoticeMap.put(dateStrKey, curDateMap);
+        }
+        return curDateMap;
+    }
+
+    private static void noticeDingDing(String symbol, BigDecimal price) {
+        //
+        String curDateKey = curDateStrKey();
+        //
         StringBuilder builder = new StringBuilder();
         builder.append("【通知】K线价格告警").append("\n");
-        builder.append("告警日期:").append(curDateStrKey()).append("\n");
         builder.append("告警时间:").append(curDateTimeStrKey()).append("\n");
         builder.append("交易对:").append(symbol).append("\n");
-        builder.append("告警价格:").append(lowPrice.toPlainString()).append("\n");
+        builder.append("当日最高:").append(highPrice(curDateKey, symbol)).append("\n");
+        builder.append("当日最低:").append(lowPrice(curDateKey, symbol)).append("\n");
         builder.append("当前价格:").append(price.toPlainString()).append("\n");
         String message = builder.toString();
         //
