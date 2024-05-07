@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Component
+// @Component
 @Slf4j
 public class BitCoinJ {
 

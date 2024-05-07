@@ -96,3 +96,12 @@ docker run -d --name bitcoin-j-verification bitcoin-j-verification
 - [bitcoinj examples](https://github.com/bitcoinj/bitcoinj/tree/release-0.16/examples/src/main/java/org/bitcoinj/examples)
 - [Install Docker Engine on CentOS](https://docs.docker.com/engine/install/centos/)
 - [docker run](https://docs.docker.com/engine/reference/commandline/run/)
+
+
+- [Binance的API文档](https://binance-docs.github.io/apidocs/spot/cn/#k)
+- [Poloniex的API文档](https://docs.poloniex.com/#public-endpoints-reference-data-symbol-information)
+- [HTX的API文档]()
+- [OKex的API文档]()
+
+
+
