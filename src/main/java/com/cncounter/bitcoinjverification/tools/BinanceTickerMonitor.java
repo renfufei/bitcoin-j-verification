@@ -3,6 +3,7 @@ package com.cncounter.bitcoinjverification.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cncounter.bitcoinjverification.model.ProxyRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,13 @@ public class BinanceTickerMonitor {
         // 行情URL
         final String BINANCE_TICKER_URL = "https://api.binance.com/api/v3/ticker/price";
         // 获取交易
-        String resp = HttpUtilsOK.get(BINANCE_TICKER_URL);
+        String resp = null;
+        try {
+            resp = HttpUtilsOK.get(BINANCE_TICKER_URL);
+        } catch (Exception ignore) {
+            // 使用代理;
+            resp = HttpUtilsOK.proxy(ProxyRequest.get(BINANCE_TICKER_URL));
+        }
         // 转换为JSON数组
         JSONArray respArray = JSONArray.parseArray(resp);
         // 转换为Java对象
@@ -272,6 +279,7 @@ public class BinanceTickerMonitor {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
         return format.format(new Date());
     }
+
     private static String curDateTimeStrKey() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         return format.format(new Date());

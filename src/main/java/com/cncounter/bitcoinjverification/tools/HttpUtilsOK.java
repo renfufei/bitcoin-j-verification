@@ -1,6 +1,7 @@
 package com.cncounter.bitcoinjverification.tools;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cncounter.bitcoinjverification.model.ProxyRequest;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -47,4 +48,10 @@ public class HttpUtilsOK {
             throw new RuntimeException("请求URL失败; url:" + url, e);
         }
     }
+
+    // 代理
+    public static String proxy(ProxyRequest proxyRequest) {
+        return post(proxyRequest.getProxy(), (JSONObject) JSONObject.toJSON(proxyRequest));
+    }
+
 }
