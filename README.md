@@ -84,6 +84,9 @@ docker run --name bitcoin-j-verification -it bitcoin-j-verification
 # 或者:后台模式运行
 docker run -d --name bitcoin-j-verification bitcoin-j-verification
 
+# 移除已有的镜像
+docker rm -f bitcoin-j-verification
+
 ```
 
 
