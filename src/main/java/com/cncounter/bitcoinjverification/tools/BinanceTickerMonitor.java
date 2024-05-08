@@ -151,13 +151,16 @@ public class BinanceTickerMonitor {
         //
         String dateStrKey = curDateStrKey();
         {
+            // 暂定变化50点才告警; 后续改为百分比
+            final BigDecimal threshold = BigDecimal.valueOf(50);
+            // 规则: 新低
             // 1.3 获取当前交易对的已通知价格;
             Map<String, BigDecimal> curDateMap = lowPriceMap(dateStrKey, symbol);
             // 1.3 获取当前交易对的已通知价格;
             BigDecimal hasNoticePrice = curDateMap.get(symbol);
             if (Objects.nonNull(hasNoticePrice)) {
-                // 已有价格 <= 低价阈值
-                if (hasNoticePrice.compareTo(price) <= 0) {
+                // 已有价格 - 新低价 > 告警变化阈值
+                if (hasNoticePrice.subtract(price).compareTo(threshold) >= 0) {
                     log.info("[低价]交易对最低价格无变化; symbol={}; hasNoticePrice={}", symbol, hasNoticePrice);
                     return; // 不再通知
                 }
@@ -175,12 +178,15 @@ public class BinanceTickerMonitor {
         String dateStrKey = curDateStrKey();
 
         {
+            // 暂定变化50点才告警; 后续改为百分比
+            final BigDecimal threshold = BigDecimal.valueOf(50);
             // 2.3 获取当前交易对的已通知价格;
             Map<String, BigDecimal> curDateMap = highPriceMap(dateStrKey, symbol);
             BigDecimal hasNoticePrice = curDateMap.get(symbol);
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
-                if (hasNoticePrice.compareTo(price) >= 0) {
+                // 新高价 - 已有价格 > 告警变化阈值
+                if (price.subtract(hasNoticePrice).compareTo(threshold) >= 0) {
                     log.info("交易对最高价格无变化[高价]; symbol={}; hasNoticePrice={}", symbol, hasNoticePrice);
                     return; // 不再通知
                 }
