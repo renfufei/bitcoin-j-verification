@@ -87,6 +87,11 @@ docker run -d --name bitcoin-j-verification bitcoin-j-verification
 # 移除已有的镜像
 docker rm -f bitcoin-j-verification
 
+
+# 查看docker日志
+docker logs -n 100 -f bitcoin-j-verification
+
+
 ```
 
 

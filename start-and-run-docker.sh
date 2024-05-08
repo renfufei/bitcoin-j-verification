@@ -11,3 +11,6 @@ docker rm -f bitcoin-j-verification
 # 或者:后台模式运行
 docker run -d --name bitcoin-j-verification bitcoin-j-verification
 
+# 查看docker日志
+docker logs -n 100 -f bitcoin-j-verification
+
