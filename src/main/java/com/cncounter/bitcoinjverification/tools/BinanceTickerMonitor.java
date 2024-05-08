@@ -154,7 +154,7 @@ public class BinanceTickerMonitor {
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
                 if (hasNoticePrice.compareTo(price) <= 0) {
-                    // log -
+                    log.info("[低价]交易对最低价格无变化; symbol={}; hasNoticePrice={}", symbol, hasNoticePrice);
                     return; // 不再通知
                 }
             }
@@ -171,7 +171,7 @@ public class BinanceTickerMonitor {
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
                 if (hasNoticePrice.compareTo(price) >= 0) {
-                    // log -
+                    log.info("交易对最高价格无变化[高价]; symbol={}; hasNoticePrice={}", symbol, hasNoticePrice);
                     return; // 不再通知
                 }
             }
