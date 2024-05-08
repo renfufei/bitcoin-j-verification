@@ -142,6 +142,10 @@ public class BinanceTickerMonitor {
 
     // 更高-更低价格
     private static void noticeLowerHigherPriceOncePerDay(BinanceTickerPrice tickerPrice) {
+        noticeLowerPriceOncePerDay(tickerPrice);
+        noticeHigherPriceOncePerDay(tickerPrice);
+    }
+    private static void noticeLowerPriceOncePerDay(BinanceTickerPrice tickerPrice) {
         String symbol = tickerPrice.getSymbol();
         BigDecimal price = tickerPrice.getPrice();
         //
@@ -149,7 +153,7 @@ public class BinanceTickerMonitor {
         {
             // 1.3 获取当前交易对的已通知价格;
             Map<String, BigDecimal> curDateMap = lowPriceMap(dateStrKey, symbol);
-            // 2.3 获取当前交易对的已通知价格;
+            // 1.3 获取当前交易对的已通知价格;
             BigDecimal hasNoticePrice = curDateMap.get(symbol);
             if (Objects.nonNull(hasNoticePrice)) {
                 // 已有价格 <= 低价阈值
@@ -163,6 +167,12 @@ public class BinanceTickerMonitor {
             // 执行通知; 不管成功失败
             noticeDingDing(symbol, price);
         }
+    }
+    private static void noticeHigherPriceOncePerDay(BinanceTickerPrice tickerPrice) {
+        String symbol = tickerPrice.getSymbol();
+        BigDecimal price = tickerPrice.getPrice();
+        //
+        String dateStrKey = curDateStrKey();
 
         {
             // 2.3 获取当前交易对的已通知价格;
