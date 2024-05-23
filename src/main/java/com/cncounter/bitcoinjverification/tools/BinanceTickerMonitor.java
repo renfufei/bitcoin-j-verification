@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cncounter.bitcoinjverification.model.ProxyRequest;
+import com.cncounter.bitcoinjverification.model.TickerPrice;
+import com.cncounter.bitcoinjverification.kline.rules.RuleApi;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.utils.DaemonThreadFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -25,6 +28,9 @@ public class BinanceTickerMonitor {
 
     private AtomicBoolean runFlag = new AtomicBoolean(true);
     private ExecutorService executor = null;
+
+    @Autowired
+    private List<RuleApi> ruleApis;
 
     @PreDestroy
     public void close() {
@@ -72,7 +78,7 @@ public class BinanceTickerMonitor {
     }
 
     // 监控币安行情;
-    public static void monitorBinanceTicker() {
+    public void monitorBinanceTicker() {
         log.info("[准备执行]monitorBinanceTicker;");
         // 行情URL
         final String BINANCE_TICKER_URL = "https://api.binance.com/api/v3/ticker/price";
@@ -103,17 +109,33 @@ public class BinanceTickerMonitor {
         // 日志; TO_DO
     }
 
-    private static void toCheckAndNotice(BinanceTickerPrice tickerPrice) {
+    private void toCheckAndNotice(BinanceTickerPrice tickerPrice) {
         // 后期可以使用 aviator, 进行条件表达式判断(解析配置的字符串规则);
         // 例如: symbol=="BTCUSDT" && price < 50000
+
+        if (null == ruleApis || ruleApis.isEmpty()) {
+            log.warn("没有通知规则: ruleApis={}", ruleApis);
+            return;
+        }
+
+        for (RuleApi ruleApi : ruleApis) {
+            try {
+                if (ruleApi.accept(tickerPrice)) {
+                    ruleApi.execute(tickerPrice);
+                }
+            } catch (Exception e) {
+                log.warn("规则执行失败: ruleApi={}", ruleApi.getClass().getSimpleName(), e);
+            }
+        }
+
 
         // 规则1
         {
             // 最低价规则;
             BigDecimal lowPrice = new BigDecimal(66000);
             if (
-                    "BTCUSDT".equals(tickerPrice.symbol)
-                            && tickerPrice.price.compareTo(lowPrice) < 0
+                    "BTCUSDT".equals(tickerPrice.getSymbol())
+                            && tickerPrice.getPrice().compareTo(lowPrice) < 0
             ) {
                 // 此最低价, 每天只通知一次;
                 // noticeLowPriceOncePerDay(tickerPrice, lowPrice);
@@ -123,12 +145,12 @@ public class BinanceTickerMonitor {
         // 规则2; 更高-更低价格
         {
             // 最低价规则;
-            BigDecimal lowPrice = tickerPrice.price;
+            BigDecimal lowPrice = tickerPrice.getPrice();
             if (
-                    "BTCUSDT".equals(tickerPrice.symbol)
+                    "BTCUSDT".equals(tickerPrice.getSymbol())
             ) {
                 // 每日监控: 更低的价格
-                noticeLowerHigherPriceOncePerDay(tickerPrice);
+                // noticeLowerHigherPriceOncePerDay(tickerPrice);
             }
         }
     }
@@ -145,6 +167,7 @@ public class BinanceTickerMonitor {
         noticeLowerPriceOncePerDay(tickerPrice);
         noticeHigherPriceOncePerDay(tickerPrice);
     }
+
     private static void noticeLowerPriceOncePerDay(BinanceTickerPrice tickerPrice) {
         String symbol = tickerPrice.getSymbol();
         BigDecimal price = tickerPrice.getPrice();
@@ -172,6 +195,7 @@ public class BinanceTickerMonitor {
             noticeDingDing(symbol, price);
         }
     }
+
     private static void noticeHigherPriceOncePerDay(BinanceTickerPrice tickerPrice) {
         String symbol = tickerPrice.getSymbol();
         BigDecimal price = tickerPrice.getPrice();
@@ -301,24 +325,6 @@ public class BinanceTickerMonitor {
         return format.format(new Date());
     }
 
-    public static class BinanceTickerPrice {
-        private String symbol;
-        private BigDecimal price;
-
-        public String getSymbol() {
-            return symbol;
-        }
-
-        public void setSymbol(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public BigDecimal getPrice() {
-            return price;
-        }
-
-        public void setPrice(BigDecimal price) {
-            this.price = price;
-        }
+    public static class BinanceTickerPrice extends TickerPrice {
     }
 }
