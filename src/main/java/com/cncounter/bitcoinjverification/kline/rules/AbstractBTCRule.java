@@ -16,6 +16,10 @@ public abstract class AbstractBTCRule implements RuleApi {
     // 缓存记录; key=日期; value=交易价;
     protected Map<String, BigDecimal> noticedPriceMap = new HashMap<>();
 
+    public AbstractBTCRule(){
+        //
+    }
+
     // 对比
     protected abstract boolean compare(BigDecimal hasNoticePrice, BigDecimal price);
 
@@ -33,10 +37,10 @@ public abstract class AbstractBTCRule implements RuleApi {
         }
         boolean needNoticeFlag = needNotice(tickerPrice);
         if (needNoticeFlag) {
-            // 保存通知价格;
-            setNoticedPrice(tickerPrice);
             // 获取通知消息
             String msg = getNoticeMessage(tickerPrice);
+            // 保存通知价格;
+            setNoticedPrice(tickerPrice);
             // 执行通知
             doNotice(msg);
             return msg;
@@ -49,7 +53,8 @@ public abstract class AbstractBTCRule implements RuleApi {
         // 已通知价格
         BigDecimal noticedPrice = getNoticedPrice();
         if (Objects.isNull(noticedPrice)) {
-            return true; // 当日没有通知; 需要通知;
+            setNoticedPrice(tickerPrice);
+            return false; // 当日没有通知; 默认不需要通知;
         }
         BigDecimal price = tickerPrice.getPrice();
         // 比较价格;
