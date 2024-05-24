@@ -88,7 +88,6 @@ public abstract class AbstractBTCRule implements RuleApi {
 
     // 获取通知消息
     protected String getNoticeMessage(TickerPrice tickerPrice) {
-        String curDateKey = curDateStrKey();
         //
         StringBuilder builder = new StringBuilder();
         builder.append("【通知】K线价格告警").append("\n");
