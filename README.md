@@ -92,6 +92,10 @@ docker rm -f bitcoin-j-verification
 docker logs -n 100 -f bitcoin-j-verification
 
 
+# 进入容器
+# docker exec -it bitcoin-j-verification /bin/sh
+
+
 ```
 
 
