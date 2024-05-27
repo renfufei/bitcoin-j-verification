@@ -14,7 +14,7 @@ import java.util.Locale;
 public class BTCRuleLowerHour1 extends AbstractBTCRule implements RuleApi {
 
     protected BigDecimal getThreshold() {
-        return BigDecimal.valueOf(50);
+        return BigDecimal.valueOf(120);
     }
 
     @Override
