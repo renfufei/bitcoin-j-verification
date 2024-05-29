@@ -17,6 +17,8 @@ public class BTCRuleHigherHour1 extends AbstractBTCRule implements RuleApi {
         return BigDecimal.valueOf(120);
     }
 
+    // 应该基于时间窗口来进行统计:
+    // 例如: 时间窗口=5分钟; 滑动窗口数量=12; 即可得到最近1小时的数据;
     @Override
     protected String curDateStrKey() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH", Locale.CHINA);
