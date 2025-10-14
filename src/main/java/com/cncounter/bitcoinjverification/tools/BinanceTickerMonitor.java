@@ -11,6 +11,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.utils.DaemonThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -25,6 +26,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 @Slf4j
 public class BinanceTickerMonitor {
+
+    @Value("${binance.monitor.flag:0}")
+    private Integer binanceMonitorFlag;
 
     private AtomicBoolean runFlag = new AtomicBoolean(true);
     private ExecutorService executor = null;
@@ -63,6 +67,10 @@ public class BinanceTickerMonitor {
                 }
             }
         };
+        if (!Integer.valueOf(1).equals(binanceMonitorFlag)) {
+            log.info("[系统启动]binanceMonitorFlag={}; 不执行相关任务启动;", binanceMonitorFlag);
+            return;
+        }
         log.info("[系统启动]准备创建线程池并提交任务");
         executor = Executors.newSingleThreadExecutor(new DaemonThreadFactory(this.getClass().getSimpleName()));
         executor.submit(task);

@@ -11,12 +11,13 @@ import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.SPVBlockStore;
 import org.bitcoinj.utils.BriefLogFormatter;
 import org.bitcoinj.wallet.Wallet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-// @Component
+@Component
 @Slf4j
 public class BitCoinJ {
 
@@ -27,8 +28,15 @@ public class BitCoinJ {
 
     public static final String MAIN_NET_FILE_PREFIX = "verification-service";
 
+    @Value("${bitcoinj.monitor.flag:0}")
+    private Integer bitcoinjMonitorFlag;
+
     @PostConstruct
     public void init() {
+        if (!Integer.valueOf(1).equals(bitcoinjMonitorFlag)){
+            log.info("[系统启动] bitcoinjMonitorFlag={}; 不执行BitCoinJ初始化", bitcoinjMonitorFlag);
+            return;
+        }
         log.info("[系统启动]BitCoinJ: 开始初始化");
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -83,6 +91,7 @@ public class BitCoinJ {
         peerGroup.startBlockChainDownload(bListener);
         // 阻塞直到下载完成;
         bListener.await();
+        //
 
         // Print a debug message with the details about the wallet. The correct balance should now be displayed.
         // System.out.println(wallet.toString());
@@ -91,30 +100,4 @@ public class BitCoinJ {
         peerGroup.stop();
     }
 
-    public static void startMainNet_BAD() {
-        //
-        BriefLogFormatter.init();
-        // 文件前缀
-        String filePrefix = MAIN_NET_FILE_PREFIX;
-        // 主网配置参数
-        NetworkParameters params = MainNetParams.get();
-        log.info("当前连接的Network: " + params.getId());
-        // 转账地址?
-        // forwardingAddress = LegacyAddress.fromBase58(params, args[0]);
-        // System.out.println("Forwarding address: " + forwardingAddress);
-
-        // Start up a basic app using a class that automates some boilerplate.
-        kit = new WalletAppKit(params, new File("."), filePrefix);
-
-        //
-        kit.setDownloadListener(DownloadListener.getInstance());
-
-        // 异步线程-开启钱包工具
-        if (autoStart.get()) {
-            kit.startAsync();
-        }
-        // 等待: 到达运行状态
-        // kit.awaitRunning();
-
-    }
 }
