@@ -13,6 +13,7 @@ import org.bitcoinj.script.ScriptPattern;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -70,17 +71,17 @@ public class DownloadListener extends DownloadProgressTracker {
         Coin fee = tx.getFee();
         // 输入: 付钱方
         List<TransactionInput> inputs = tx.getInputs();
-        JSONArray txInArray = parTxInput(inputs, networkParams);
+        List<TransactionFlow> txInArray = parseTxInput(inputs, networkParams);
         log.info("[下载监听]解析到交易付款方信息:\n{}", StringFormatUtils.str(txInArray));
 
         // 输出: 收款方, + 找零付款方
         List<TransactionOutput> outputs = tx.getOutputs();
-        JSONArray txOutArray = parseTxOut(outputs, networkParams);
+        List<TransactionFlow> txOutArray = parseTxOut(outputs, networkParams);
         log.info("[下载监听]解析到交易收款方信息:\n{}", StringFormatUtils.str(txOutArray));
     }
 
-    private JSONArray parTxInput(List<TransactionInput> inputs, NetworkParameters networkParams) {
-        JSONArray resultArray = new JSONArray();
+    private List<TransactionFlow> parseTxInput(List<TransactionInput> inputs, NetworkParameters networkParams) {
+        List<TransactionFlow> resultArray = new ArrayList<>();
         for (TransactionInput input : inputs) {
             int index = input.getIndex();
             //
@@ -117,8 +118,8 @@ public class DownloadListener extends DownloadProgressTracker {
         return resultArray;
     }
 
-    private JSONArray parseTxOut(List<TransactionOutput> outputs, NetworkParameters networkParams) {
-        JSONArray resultArray = new JSONArray();
+    private List<TransactionFlow> parseTxOut(List<TransactionOutput> outputs, NetworkParameters networkParams) {
+        List<TransactionFlow> resultArray = new ArrayList<>();
         // 分析输出
         for (TransactionOutput out : outputs) {
             // int outputIndex = out.getIndex();

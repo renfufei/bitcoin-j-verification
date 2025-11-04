@@ -34,7 +34,7 @@ public class BitCoinJ {
     @PostConstruct
     public void init() {
         if (!Integer.valueOf(1).equals(bitcoinjMonitorFlag)){
-            log.info("[系统启动] bitcoinjMonitorFlag={}; 不执行BitCoinJ初始化", bitcoinjMonitorFlag);
+            log.info("[系统启动]bitcoinjMonitorFlag={}; 不执行BitCoinJ初始化", bitcoinjMonitorFlag);
             return;
         }
         log.info("[系统启动]BitCoinJ: 开始初始化");
